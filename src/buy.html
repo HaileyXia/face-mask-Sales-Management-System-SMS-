@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title> Purchase </title>
+		<link rel="stylesheet" type="text/css" href="main.css">
+		<script type="text/javascript" src="../published/jquery-3.5.1.min.js"></script>
+	</head>
+	<body>
+		<div class="menu">
+			<ul class="menubar">
+				<li><a class="a" href="viewOrder.php">View Order</a></li>
+				<li><a class="a" href="chooseRep.php">View Rep</a></li>
+				<li><a class="a" href="logout.php">Log out</a></li>
+			</ul>
+		</div>
+		<form id="form">
+			<div>
+			<h1>Woolin Auto Mask Selection</h1>
+			<img src="n95_1.png" width="10%">
+			<label> 
+				N95 respirators($5 each)
+				<input type = "text" name="n95" id = "n95" size = "5" placeholder="number" />
+			</label>
+			<br /><br>
+			<img src="surgical.png" width="10%">
+			<label> 
+				surgical masks($2 each)
+				<input type = "text" name="smask" id = "smask" size = "5" placeholder="number" />
+			</label>
+			<br/><br>
+			<img src="n95_2.png" width="10%">
+			<label> 
+				surgical N95 respirators($10 each)
+				<input type = "text" name="sn95" id = "sn95" size = "5" placeholder="number" />
+			</label>
+			<br /><br>
+			<input type="text" name="choose" placeholder="Enter the employeeID you choose" size="40" id="choose"><br><br>
+			<input type = "button" name = "submit" value="Buy Now" id="submit" />
+		</div>
+		</form>
+		<script type="text/javascript">
+			var flag = 0;
+			$(document).ready(function(){
+				$("#submit").click(function(){
+					validation();
+					if(flag == 0){
+						checkBuy();
+					}
+	        	});
+			});
+			function validation(){ //check if the value is valid
+				var reg = new RegExp("^[0-9]*$");
+				var n95 = document.getElementById("n95");
+				var smask = document.getElementById("smask");
+				var sn95 = document.getElementById("sn95");
+				if((!reg.test(n95.value))||(!reg.test(smask.value))||(!reg.test(sn95.value))||(n95.value==0&&smask.value==0&&sn95.value==0)){
+					alert("You can only input numbers or you can not buy nothing!");
+					window.location.href = "buy.html";
+					flag = 1;
+				}
+				else{
+					flag = 0;
+				}
+			}
+			function checkBuy(){ 
+				$n95 = $("#n95").val();
+				$smask = $("#smask").val();
+				$sn95 = $("#sn95").val();
+				$choose = $("#choose").val();
+				$totalCost = (($n95 * 5.0) + (2.0 * $smask) + (10.0 * $sn95));//calculate the total
+				$.ajax({ //pass value to php
+					type:'POST',
+	            	url:'buy.php',
+	            	async: 'false',
+	            	contentType: 'application/json',
+	            	dataType: 'json',
+	            	data:JSON.stringify({
+	            		n95:$n95,
+	            		smask:$smask,
+	            		sn95:$sn95,
+	            		choose:$choose,
+	            		totalCost:$totalCost
+	            	}),
+	            	success:function(response){ //get the return response 
+	                	if(response.status == "fail") {
+	                    	alert("Incorrect purchase!");
+	                	}
+	                	else if(response.status == "invalidrep"){
+	                		alert("You can only choose a rep in your region!")
+	                	}
+	                	else {
+	                   		alert("Place an order successfully!");
+	                    	window.location.href = "viewOrder.php";
+	                }
+	            }
+			});
+		}
+		</script>			
+	</body>
+</html>

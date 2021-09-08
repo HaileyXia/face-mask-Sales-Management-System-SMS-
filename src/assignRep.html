@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title> Assign new Representative </title>
+		<link rel="stylesheet" type="text/css" href="main.css">
+		<script type="text/javascript" src="../published/jquery-3.5.1.min.js"></script>
+	</head>
+	<body>
+		<div class="menu">
+			<ul class="menubar">
+				<li><a class="a" href="viewRegion.php">Order(Region)</a></li>
+				<li><a class="a" href="viewChart.php">Order(Rep)</a></li>
+				<li><a class="a" href="viewUnderOrder.php">UnderOrdering</a></li>
+				<li><a class="a" href="viewAll.php">All Order</a></li>
+				<li><a class="a" href="viewCustomer.html">Order(User)</a></li>
+				<li><a class="a" href="viewRepInfo.php">Rep Info</a></li>
+				<li><a class="a" href="changeQuota.html">Change Quota</a></li>
+				<li><a class="a" href="logout.php">Log out</a></li>
+			</ul>
+		</div>
+		<form id="form">
+			<div>
+			<h1>Woolin Auto Mask Representative Region Change</h1>
+			<h3>please choose one employeeID you want to change region.</h3>
+			<label> 
+				Please enter the employeeID you want to change
+				<input type = "text" name="employeeID" id = "employeeID" size = "10" />
+			</label>
+			<br /><br>
+			<label>
+				Please choose one region you want to change
+			</label>
+			<select name="region" id="region" >
+                <option>China</option>
+                <option>USA</option>
+                <option>UK</option>
+                <option>Japan</option>
+            </select>
+			<br /><br>
+			<input type = "button" name = "submit" value="Submit" id="submit" /><br>
+		</div>
+		<div id="footer">Copyright © 2020 Tianqi XIA. All rights reserved. </div>
+		</form>
+		<script type="text/javascript">
+			var flag = 0; 
+			$(document).ready(function(){
+				$("#submit").click(function(){
+					validation();
+					if(flag == 0){
+						check();
+					}
+	        	});
+			});
+			function validation(){ //check if number is valid
+				var reg = new RegExp("^[0-9]*$");
+				var employeeID = document.getElementById("employeeID");
+				if((!reg.test(employeeID.value))||(employeeID.value=="")){
+					alert("You can only enter numbers!");
+					window.location.href = "assignRep.html";
+					flag = 1;
+				}
+				else{
+					flag = 0;
+				}
+			}
+			function check(){ 
+				$employeeID = $("#employeeID").val();
+				$region = $("#region").val();
+				$.ajax({ //pass value to php
+					type:'POST',
+	            	url:'assignRep.php',
+	            	async: 'false',
+	            	contentType: 'application/json',
+	            	dataType: 'json',
+	            	data:JSON.stringify({
+	            		employeeID:$employeeID,
+	            		region:$region
+	            	}),
+	            	success:function(response){ //get the return response
+	                	if(response.status == "fail") {
+	                    	alert("Change region failed!");
+	                    	window.location.href = "assignRep.html";
+	                	}
+	                	else if(response.status == "range"){
+	                		alert("EmployeeID is not in the range!");
+	                    	window.location.href = "assignRep.html";
+	                	}
+	                	else {
+	                   		alert("Change region successfully!");
+	                    	window.location.href = "viewChart.php";
+	                }
+	            }
+			});
+		}
+		</script>			
+	</body>
+</html>

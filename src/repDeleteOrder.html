@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title> Delete Order </title>
+		<link rel="stylesheet" type="text/css" href="main.css">
+		<script type="text/javascript" src="../published/jquery-3.5.1.min.js"></script>
+	</head>
+	<body>
+		<div class="menu">
+			<ul class="menubar">
+				<li><a class="a" href="repViewPersonal.php">View Info</a></li>
+				<li><a class="a" href="repViewOrder.php">View Order</a></li>
+				<li><a class="a" href="logout.php">Log out</a></li>
+			</ul>
+		</div>
+		<form id="form">
+			<div>
+			<h1>Woolin Auto Mask Order Deletion</h1>
+			<h3>please choose one orderingID you want to delete.</h3>
+			<label> 
+				Please enter the orderingID you want to delete(you can only delete order in 24 hours and you can only delete the order when exceeds your quota) 
+				<input type = "text" name="deleteorder" id = "deleteorder" size = "10" />
+			</label>
+			<br /><br>
+			<br /><br>
+			<input type = "button" name = "submit" value="Delete Now" id="submit" />
+		</div>
+		</form>
+		<div id="footer">Copyright © 2020 Tianqi XIA. All rights reserved. </div>
+		<script type="text/javascript">
+			var flag = 0;
+			$(document).ready(function(){
+				$("#submit").click(function(){
+					validation();
+					if(flag == 0){
+						check();
+					}
+	        	});
+			});
+			function validation(){  //check if the number is valid
+				var reg = new RegExp("^[0-9]*$");
+				var deleteorder = document.getElementById("deleteorder");
+				if((!reg.test(deleteorder.value))||(deleteorder.value=="")){
+					alert("You can only enter numbers!");
+					window.location.href = "repDeleteOrder.html";
+					flag = 1;
+				}
+				else{
+					flag = 0;
+				}
+			}
+			function check(){
+				$deleteorder = $("#deleteorder").val();
+				$.ajax({  //pass value to php
+					type:'POST',
+	            	url:'repDeleteOrder.php',
+	            	async: 'false',
+	            	contentType: 'application/json',
+	            	dataType: 'json',
+	            	data:JSON.stringify({
+	            		deleteorder:$deleteorder
+	            	}),
+	            	success:function(response){   //get the return response   
+	                	if(response.status == "fail") {
+	                    	alert("Please enter a correct Ordering ID!");
+	                    	window.location.href = "repDeleteOrder.html";
+	                	}
+	                	else if(response.status == "invalid"){
+	                		alert("Please enter a correct Ordering ID of You!");
+	                		window.location.href = "repDeleteOrder.html";
+	                	}
+	                	else if(response.status == "excess"){
+	                		alert("You can only delete the order when exceeds your quota!");
+	                		window.location.href = "repDeleteOrder.html";
+	                	}
+	                	else if(response.status == "overtime"){
+	                		alert("You can only delete order in 24 hours!");
+	                		window.location.href = "repDeleteOrder.html";
+	                	}
+	                	else {
+	                   		alert("Delete an order successfully!");
+	                    	window.location.href = "repViewOrder.php";
+	                }
+	            }
+			});
+		}
+		</script>			
+	</body>
+</html>

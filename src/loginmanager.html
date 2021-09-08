@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>Log In As a Manager</title>
+		<link rel="stylesheet" type="text/css" href="main.css">
+        <script type="text/javascript" src="../published/jquery-3.5.1.min.js"></script>
+	</head>
+	<body>
+		<div class="menu">
+			<ul class="menubar">
+				<li><a class="a" href="index.html">Home</a></li>
+			</ul>
+		</div>
+		<form id="form">
+			<table align="center" height="300">
+				<caption><h3>Log in As a Manager</h3></caption>
+				<tr>
+					<td>Username</td>
+					<td>
+						<input type="text" name="user" id="user">
+					</td>
+				</tr>
+				<tr>
+					<td>Password</td>
+					<td>
+						<input type="password" name="pwd" id="pwd">
+					</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>
+						<input type="button" value="login" name="submit" id="submit">
+					</td>
+				</tr>
+			</table>
+			<div id="footer">Copyright © 2020 Tianqi XIA. All rights reserved. </div>
+		</form>	
+		<script type="text/javascript">
+			$(document).ready(function(){
+				$("#submit").click(function(){
+					checkLogin();
+	        	});
+			});
+			function checkLogin(){
+				$user = $("#user").val();
+				$pwd = $("#pwd").val();
+				$.ajax({ //pass value to php
+					type:'POST',
+	            	url:'loginmanager.php',
+	            	async: 'false',
+	            	contentType: 'application/json',
+	            	dataType: 'json',
+	            	data:JSON.stringify({
+	            		user:$user,
+	            		pwd:$pwd  
+	            	}),
+	            	success:function(response){   //get the return response  
+	                	if(response.status == "fail") {
+	                    	alert("Wrong name or password!");
+	                	}
+	                	else {
+	                   		alert("Log in successfully!");
+	                    	window.location.href = "viewChart.php";
+	                }
+	            }
+			});
+		}
+		</script>
+	</body>
+</html>
